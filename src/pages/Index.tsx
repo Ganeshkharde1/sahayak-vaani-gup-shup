@@ -1,12 +1,22 @@
 
 import { useState } from 'react';
+import LandingPage from '@/components/LandingPage';
 import { BookOpen } from 'lucide-react';
 import UserModeSelector from '@/components/UserModeSelector';
 import StudentTabs from '@/components/StudentTabs';
 import TeacherPanel from '@/components/TeacherPanel';
 
 const Index = () => {
+  const [showDashboard, setShowDashboard] = useState(false);
   const [userMode, setUserMode] = useState<'student' | 'teacher'>('student');
+
+  const handleGetStarted = () => {
+    setShowDashboard(true);
+  };
+
+  if (!showDashboard) {
+    return <LandingPage onGetStarted={handleGetStarted} />;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-green-50 to-blue-50">
