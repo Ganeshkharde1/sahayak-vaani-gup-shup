@@ -16,7 +16,7 @@ interface Message {
   timestamp: Date;
 }
 
-interface KnowledgeResponse {
+interface KnowledgeResponseData {
   explanation: string;
   analogy: string;
   keyPoints: string[];
@@ -30,7 +30,7 @@ const VoiceInterface = () => {
   const [isMuted, setIsMuted] = useState(false);
   const [showKnowledgeBase, setShowKnowledgeBase] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState('');
-  const [knowledgeResponse, setKnowledgeResponse] = useState<KnowledgeResponse | null>(null);
+  const [knowledgeResponse, setKnowledgeResponse] = useState<KnowledgeResponseData | null>(null);
   
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -139,7 +139,7 @@ const VoiceInterface = () => {
     }
   };
 
-  const handleKnowledgeResponse = (response: KnowledgeResponse) => {
+  const handleKnowledgeResponse = (response: KnowledgeResponseData) => {
     setKnowledgeResponse(response);
     setShowKnowledgeBase(false);
     
