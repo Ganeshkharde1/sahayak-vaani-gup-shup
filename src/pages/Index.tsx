@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { BookOpen } from 'lucide-react';
 import UserModeSelector from '@/components/UserModeSelector';
-import VoiceInterface from '@/components/VoiceInterface';
+import StudentTabs from '@/components/StudentTabs';
 import TeacherPanel from '@/components/TeacherPanel';
 
 const Index = () => {
@@ -12,7 +12,7 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-green-50 to-blue-50">
       {/* Header */}
       <header className="bg-white shadow-sm border-b-4 border-orange-400">
-        <div className="max-w-4xl mx-auto px-4 py-6">
+        <div className="max-w-6xl mx-auto px-4 py-6">
           <div className="flex items-center justify-center">
             <div className="flex items-center space-x-3">
               <div className="w-12 h-12 bg-gradient-to-r from-orange-400 to-orange-500 rounded-full flex items-center justify-center">
@@ -27,13 +27,13 @@ const Index = () => {
         </div>
       </header>
 
-      <div className="max-w-4xl mx-auto px-4 py-8">
+      <div className="max-w-6xl mx-auto px-4 py-8">
         {/* User Mode Selection */}
         <UserModeSelector userMode={userMode} onModeChange={setUserMode} />
 
         {/* Content based on user mode */}
         {userMode === 'student' ? (
-          <VoiceInterface />
+          <StudentTabs />
         ) : (
           <TeacherPanel />
         )}
