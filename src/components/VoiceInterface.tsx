@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect } from 'react';
 import { Mic, MicOff, Volume2, VolumeX, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -7,6 +6,8 @@ import { useToast } from '@/hooks/use-toast';
 import VoiceVisualizer from '@/components/VoiceVisualizer';
 import ChatMessage from '@/components/ChatMessage';
 import WelcomeCard from '@/components/WelcomeCard';
+import KnowledgeBase from '@/components/KnowledgeBase';
+import KnowledgeResponse from '@/components/KnowledgeResponse';
 
 interface Message {
   id: string;
@@ -15,12 +16,21 @@ interface Message {
   timestamp: Date;
 }
 
+interface KnowledgeResponse {
+  explanation: string;
+  analogy: string;
+  keyPoints: string[];
+}
+
 const VoiceInterface = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [audioLevel, setAudioLevel] = useState(0);
   const [isMuted, setIsMuted] = useState(false);
+  const [showKnowledgeBase, setShowKnowledgeBase] = useState(false);
+  const [currentQuestion, setCurrentQuestion] = useState('');
+  const [knowledgeResponse, setKnowledgeResponse] = useState<KnowledgeResponse | null>(null);
   
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -41,8 +51,8 @@ const VoiceInterface = () => {
       
       mediaRecorderRef.current.ondataavailable = (event) => {
         if (event.data.size > 0) {
-          // Here you would send the audio data to your AI service
-          handleAudioResponse("यह एक नमूना उत्तर है। मैं आपकी मदद करने के लिए यहाँ हूँ!");
+          // Enhanced response handling with knowledge base
+          handleAudioResponse("यह एक नमूना उत्तर है। अगर आपका सवाल जटिल है तो मैं इसे आसान भाषा में समझा सकता हूँ!");
         }
       };
       
@@ -79,7 +89,7 @@ const VoiceInterface = () => {
     setIsRecording(false);
     setAudioLevel(0);
     
-    // Add user message placeholder
+    // Add user message placeholder and show knowledge base for complex questions
     const userMessage: Message = {
       id: Date.now().toString(),
       text: "आपका सवाल रिकॉर्ड हो गया है...",
@@ -88,6 +98,8 @@ const VoiceInterface = () => {
     };
     
     setMessages(prev => [...prev, userMessage]);
+    setCurrentQuestion("आसमान नीला क्यों होता है?"); // Sample question
+    setShowKnowledgeBase(true);
   };
   
   const monitorAudioLevel = () => {
@@ -126,9 +138,30 @@ const VoiceInterface = () => {
       setTimeout(() => setIsSpeaking(false), 3000);
     }
   };
+
+  const handleKnowledgeResponse = (response: KnowledgeResponse) => {
+    setKnowledgeResponse(response);
+    setShowKnowledgeBase(false);
+    
+    // Add the knowledge response as a message
+    const knowledgeMessage: Message = {
+      id: (Date.now() + 2).toString(),
+      text: `${response.explanation}\n\n${response.analogy}`,
+      isUser: false,
+      timestamp: new Date(),
+    };
+    
+    setMessages(prev => [...prev, knowledgeMessage]);
+  };
+
+  const handleCloseKnowledgeResponse = () => {
+    setKnowledgeResponse(null);
+  };
   
   const clearChat = () => {
     setMessages([]);
+    setShowKnowledgeBase(false);
+    setKnowledgeResponse(null);
     toast({
       title: "चैट साफ़ कर दिया गया",
       description: "नई बातचीत शुरू करें",
@@ -167,6 +200,27 @@ const VoiceInterface = () => {
           <ChatMessage key={message.id} message={message} />
         ))}
       </div>
+
+      {/* Knowledge Base */}
+      {showKnowledgeBase && (
+        <div className="mb-6">
+          <KnowledgeBase
+            question={currentQuestion}
+            onResponse={handleKnowledgeResponse}
+          />
+        </div>
+      )}
+
+      {/* Knowledge Response Display */}
+      {knowledgeResponse && (
+        <div className="mb-6">
+          <KnowledgeResponse
+            response={knowledgeResponse}
+            question={currentQuestion}
+            onClose={handleCloseKnowledgeResponse}
+          />
+        </div>
+      )}
       
       {/* Voice Interface */}
       <Card className="p-8 bg-white/80 backdrop-blur-sm border-2 border-orange-200 shadow-xl">
@@ -211,10 +265,10 @@ const VoiceInterface = () => {
         </div>
       </Card>
       
-      {/* Quick Help */}
+      {/* Enhanced Quick Help */}
       <div className="mt-8 text-center">
         <p className="text-sm text-gray-600 mb-4">💡 मुझसे ये सब पूछ सकते हैं:</p>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Card className="p-4 bg-orange-50 border-orange-200">
             <p className="text-sm font-medium text-orange-800">📚 पाठ्यक्रम के सवाल</p>
           </Card>
@@ -223,6 +277,9 @@ const VoiceInterface = () => {
           </Card>
           <Card className="p-4 bg-blue-50 border-blue-200">
             <p className="text-sm font-medium text-blue-800">🔬 विज्ञान के प्रयोग</p>
+          </Card>
+          <Card className="p-4 bg-purple-50 border-purple-200">
+            <p className="text-sm font-medium text-purple-800">🤔 जटिल सवालों की आसान व्याख्या</p>
           </Card>
         </div>
       </div>
