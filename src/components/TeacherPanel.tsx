@@ -1,13 +1,14 @@
 
 import { useState } from 'react';
-import { MessageSquare, FileText, Upload } from 'lucide-react';
+import { MessageSquare, FileText, Upload, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import TeacherQuery from '@/components/TeacherQuery';
 import StoryDisplay from '@/components/StoryDisplay'; 
 import DifferentiatedMaterials from '@/components/DifferentiatedMaterials';
+import WeeklyLessonPlanner from '@/components/WeeklyLessonPlanner';
 
 const TeacherPanel = () => {
-  const [activeTab, setActiveTab] = useState<'story' | 'materials'>('story');
+  const [activeTab, setActiveTab] = useState<'story' | 'materials' | 'planner'>('story');
   const [generatedStory, setGeneratedStory] = useState<string>('');
   const [storyQuery, setStoryQuery] = useState<string>('');
   const [showStory, setShowStory] = useState(false);
@@ -53,6 +54,19 @@ const TeacherPanel = () => {
           <Upload className="w-4 h-4" />
           <span>शिक्षण सामग्री</span>
         </Button>
+
+        <Button
+          onClick={() => setActiveTab('planner')}
+          variant={activeTab === 'planner' ? 'default' : 'outline'}
+          className={`flex items-center space-x-2 ${
+            activeTab === 'planner' 
+              ? 'bg-gradient-to-r from-blue-400 to-blue-500 text-white' 
+              : 'border-blue-200 hover:bg-blue-50'
+          }`}
+        >
+          <Calendar className="w-4 h-4" />
+          <span>साप्ताहिक योजना</span>
+        </Button>
       </div>
 
       {/* Content based on active teacher tab */}
@@ -69,8 +83,10 @@ const TeacherPanel = () => {
             />
           )}
         </>
-      ) : (
+      ) : activeTab === 'materials' ? (
         <DifferentiatedMaterials />
+      ) : (
+        <WeeklyLessonPlanner />
       )}
     </div>
   );
